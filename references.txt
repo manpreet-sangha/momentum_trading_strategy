@@ -1,0 +1,21 @@
+Asquith, P., Pathak, P. A., & Ritter, J. R. (2005). Short interest, institutional ownership, and stock returns. Journal of Financial Economics, 78(2), 243-276. https://doi.org/10.1016/j.jfineco.2005.01.001
+
+Boehmer, E., Huszar, Z. R., & Jordan, B. D. (2010). The good news in short interest. Journal of Financial Economics, 96(1), 80-97. https://doi.org/10.1016/j.jfineco.2009.12.002
+
+Campbell, J. Y., Ramadorai, T., & Schwartz, A. (2009). Caught on tape: Institutional trading, stock returns, and earnings announcements. Journal of Financial Economics, 92(1), 66-91. https://doi.org/10.1016/j.jfineco.2008.03.006
+
+COHEN, L., MALLOY, C., & POMORSKI, L. (2012). Decoding inside information. The Journal of Finance (New York), 67(3), 1009-1043. https://doi.org/10.1111/j.1540-6261.2012.01740.x
+
+Gene, D. (2002). The market for borrowing stock. Journal of Financial Economics, 66(2-3), 271-306. https://doi.org/10.1016/S0304-405X(02)00206-4
+
+de Groot, W., Huij, J., & Zhou, W. (2012). Another look at trading costs and short-term reversal profits. Journal of Banking & Finance, 36(2), 371-382. https://doi.org/10.1016/j.jbankfin.2011.07.015
+
+Desai, H., Ramesh, K., Thiagarajan, S. R., & Balachandran, B. V. (2002). An investigation of the informational role of short interest in the nasdaq market. The Journal of Finance (New York), 57(5), 2263-2287. https://doi.org/10.1111/0022-1082.00495
+
+Geczy, C. C., Musto, D. K., & Reed, A. V. (2002). Stocks are special too: An analysis of the equity lending market. Journal of Financial Economics, 66(2), 241-269. https://doi.org/10.1016/S0304-405X(02)00225-8
+
+Jegadeesh, N. (1995). Short-horizon return reversals and the bid-ask spread. Journal of Financial Intermediation, 4(2), 116-132. https://doi.org/10.1006/jfin.1995.1006
+
+Nagel, S. (2012). Evaporating liquidity. The Review of Financial Studies, 25(7), 2005-2039. https://doi.org/10.1093/rfs/hhs066
+
+Moskowitz, T. J., Ooi, Y. H., & Pedersen, L. H. (2012). Time series momentum. Journal of Financial Economics, 104(2), 228-250. https://doi.org/10.1016/j.jfineco.2011.11.003

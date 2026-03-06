@@ -16,8 +16,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-
-WEEKS_PER_YEAR = 52  # used to annualise weekly statistics
+from config import WEEKS_PER_YEAR
 
 
 # =====================================================================
@@ -152,14 +151,25 @@ def plot_main_results(dates, gamma_std, gamma_adj, comomentum, scaling,
     cum_std = np.nancumsum(gamma_std)
     cum_adj = np.nancumsum(gamma_adj)
 
+    # Diagnostic: confirm both series have data
+    n_fin_std = int(np.sum(np.isfinite(gamma_std)))
+    n_fin_adj = int(np.sum(np.isfinite(gamma_adj)))
+    print(f"  [plot_main_results] gamma_std finite: {n_fin_std}, "
+          f"gamma_adj finite: {n_fin_adj}")
+    print(f"  [plot_main_results] cum_std range: "
+          f"[{np.nanmin(cum_std):.4f}, {np.nanmax(cum_std):.4f}]")
+    print(f"  [plot_main_results] cum_adj range: "
+          f"[{np.nanmin(cum_adj):.4f}, {np.nanmax(cum_adj):.4f}]")
+
     fig, axes = plt.subplots(3, 1, figsize=(14, 14))
 
     # ---- Panel 1: Cumulative Factor Returns ----
     ax1 = axes[0]
-    ax1.plot(dates, cum_std, label='Standard Momentum',
-             linewidth=1.2, color='steelblue')
+    # Plot adjusted FIRST (behind), then standard ON TOP so both visible
     ax1.plot(dates, cum_adj, label='Adjusted Momentum (Comomentum)',
-             linewidth=1.2, color='darkorange')
+             linewidth=1.2, color='darkorange', zorder=2)
+    ax1.plot(dates, cum_std, label='Standard Momentum',
+             linewidth=1.2, color='steelblue', zorder=3)
     ax1.set_title('Cumulative Factor Returns: Standard vs. Adjusted Momentum',
                   fontsize=14, fontweight='bold')
     ax1.set_xlabel('Date')
