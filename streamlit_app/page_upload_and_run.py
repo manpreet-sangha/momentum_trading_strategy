@@ -413,8 +413,62 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
                         _vis = min(len(_df_sheet), _max_v)
                         st.dataframe(_df_sheet, use_container_width=True,
                                      height=_hdr_h + _row_h * _vis + 2)
-                _show_table(os.path.join(output_dir, "pairwise_correlations.xlsx"),
-                            "pairwise_correlations.xlsx")
+                _pw_path = os.path.join(output_dir, "pairwise_correlations.xlsx")
+                if os.path.isfile(_pw_path):
+                    st.markdown("**pairwise_correlations.xlsx**")
+                    # ── Documentation: extract key summary stats ─────
+                    _doc = pd.read_excel(_pw_path, sheet_name='Documentation')
+                    _doc_dict = dict(zip(_doc['Item'].astype(str).str.strip(),
+                                         _doc['Details'].astype(str).str.strip()))
+                    _snap_date = _doc_dict.get('Snapshot date', '')
+                    _window    = _doc_dict.get('Rolling window', '')
+                    _comom_val = _doc_dict.get('COMOMENTUM', '')
+                    st.caption(f"Snapshot: **{_snap_date}** · Window: {_window}")
+
+                    # Key metrics in columns
+                    _lc, _rc = st.columns(2)
+                    with _lc:
+                        st.markdown("**Loser Decile**")
+                        _l_n = _doc_dict.get('N stocks in decile', '')
+                        _l_p = _doc_dict.get('N unique pairs', '')
+                        _l_c = _doc_dict.get('Mean pairwise correlation (= CoMOM_L)', '')
+                        st.caption(f"Stocks: {_l_n} · Pairs: {_l_p} · CoMOM_L: {_l_c}")
+                    with _rc:
+                        st.markdown("**Winner Decile**")
+                        # Winner values appear after loser in the doc;
+                        # read them from the raw rows to avoid key collisions
+                        _doc_rows = list(zip(_doc['Item'].astype(str).str.strip(),
+                                             _doc['Details'].astype(str).str.strip()))
+                        _in_winner = False
+                        _w_n = _w_p = _w_c = ''
+                        for _k, _v in _doc_rows:
+                            if _k == 'WINNER DECILE':
+                                _in_winner = True
+                            elif _k == 'COMOMENTUM':
+                                break
+                            elif _in_winner:
+                                if _k.startswith('N stocks'):
+                                    _w_n = _v
+                                elif _k.startswith('N unique'):
+                                    _w_p = _v
+                                elif _k.startswith('Mean pairwise'):
+                                    _w_c = _v
+                        st.caption(f"Stocks: {_w_n} · Pairs: {_w_p} · CoMOM_W: {_w_c}")
+
+                    st.markdown(f"**Comomentum = {_comom_val}**")
+
+                    # ── Pairwise long-format tables ──────────────────
+                    for _sheet, _lbl in [("Loser_Pairwise", "Loser Pairwise Correlations"),
+                                         ("Winner_Pairwise", "Winner Pairwise Correlations")]:
+                        try:
+                            _df_pw = pd.read_excel(_pw_path, sheet_name=_sheet)
+                        except Exception:
+                            continue
+                        st.markdown(f"**{_lbl}** ({len(_df_pw):,} pairs)")
+                        _row_h, _hdr_h, _max_v = 35, 38, 20
+                        _vis = min(len(_df_pw), _max_v)
+                        st.dataframe(_df_pw, use_container_width=True,
+                                     height=_hdr_h + _row_h * _vis + 2)
 
         # ── Step 5: Adjust Momentum ──────────────────────────────────
         _update("Adjusting momentum with inverse comomentum …", 72,
