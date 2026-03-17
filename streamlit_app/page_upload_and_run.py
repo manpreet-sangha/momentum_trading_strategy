@@ -357,8 +357,6 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
                 c3.metric("Std comomentum", f"{np.nanstd(comomentum_arr):.4f}")
                 _show_image(os.path.join(output_dir, "plot_comom_time_series.png"),
                             "Comomentum Time Series")
-                _show_image(os.path.join(output_dir, "plot_comom_event_study.png"),
-                            "Comomentum Event Study")
                 # ── Table I: Summary Statistics ─────────────────────
                 st.markdown("#### Table I — Summary Statistics")
                 if table1_panels is not None:
