@@ -302,9 +302,9 @@ All outputs are written to `output_data/`.
 
 ## Disclaimer
 
-### AI Assistance
+### AI Usage Disclosure
 
-This project was developed with the assistance of AI tools (GitHub Copilot). AI was used to support coding, debugging, and documentation throughout the development process. All outputs were reviewed, validated, and approved by the author. The academic analysis, methodology decisions, and interpretation of results are the author's own.
+We used GitHub Copilot to accelerate the implementation of data pipelines, statistical computations, and plotting routines. All generated code was reviewed, tested, and validated by us. AI was used strictly as a productivity tool.
 
 ### Academic Integrity — Do Not Copy
 
