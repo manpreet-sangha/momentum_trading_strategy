@@ -172,14 +172,10 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
                 c2.metric("Stocks (N)", f"{data['N']:,}")
                 c3.metric("Date range", f"{data['dates'][0].strftime('%Y-%m-%d')}  →  "
                           f"{data['dates'][-1].strftime('%Y-%m-%d')}")
-                _show_image(os.path.join(output_dir, "plot1_universe_size.png"),
-                            "Universe Size Over Time")
-                _show_image(os.path.join(output_dir, "plot2_listed_vs_notlisted.png"),
-                            "Listed vs Not-Listed")
-                _show_image(os.path.join(output_dir, "plot3_return_statistics.png"),
-                            "Weekly Return Statistics")
                 _show_image(os.path.join(output_dir, "plot6_ff_cumulative_returns.png"),
                             "FF Factor Cumulative Returns")
+                _show_image(os.path.join(output_dir, "plot10_loading_summary.png"),
+                            "Data Loading Summary")
                 st.divider()
                 st.markdown("##### Output Files")
                 _show_table(os.path.join(output_dir, "combined_data_verification.xlsx"),
