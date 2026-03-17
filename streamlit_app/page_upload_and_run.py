@@ -125,7 +125,7 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
             st.image(path, caption=caption, use_container_width=True)
 
     def _show_table(path: str, label: str = ""):
-        """Display a full CSV or Excel file inside the current context."""
+        """Display a CSV or Excel file with up to 30 visible rows (scrollable)."""
         if not os.path.isfile(path):
             return
         if path.endswith(".xlsx"):
@@ -133,10 +133,12 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
         else:
             df = pd.read_csv(path)
         if label:
-            st.markdown(f"**{label}**")
+            st.markdown(f"**{label}**  ({len(df):,} rows)")
         row_height = 35
         header_height = 38
-        height = header_height + row_height * len(df) + 2
+        max_visible = 30
+        visible_rows = min(len(df), max_visible)
+        height = header_height + row_height * visible_rows + 2
         st.dataframe(df, use_container_width=True, height=height)
 
     # Render initial state (all pending)
