@@ -11,7 +11,10 @@ import shutil
 import logging
 import traceback
 import numpy as np
+import pandas as pd
 import streamlit as st
+
+_MAX_PREVIEW_ROWS = 20
 
 
 # ── File specifications ──────────────────────────────────────────────
@@ -123,6 +126,21 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
         if os.path.isfile(path):
             st.image(path, caption=caption, use_container_width=True)
 
+    def _show_csv(path: str, label: str = ""):
+        """Display a CSV preview inside the current context."""
+        if not os.path.isfile(path):
+            return
+        df = pd.read_csv(path, nrows=_MAX_PREVIEW_ROWS + 1)
+        total_rows = sum(1 for _ in open(path, encoding="utf-8")) - 1  # exclude header
+        if label:
+            st.markdown(f"**{label}**")
+        if total_rows > _MAX_PREVIEW_ROWS:
+            st.caption(f"Showing first {_MAX_PREVIEW_ROWS} of {total_rows:,} rows "
+                       f"(large dataset — {os.path.getsize(path)/1024:.0f} KB)")
+            st.dataframe(df.head(_MAX_PREVIEW_ROWS), use_container_width=True)
+        else:
+            st.dataframe(df, use_container_width=True)
+
     # Render initial state (all pending)
     _render_step_tracker(status_container, step_statuses)
 
@@ -180,6 +198,14 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
                 if len(df_gaps) > 0:
                     st.caption("Stocks with trading gaps (kept for per-window checks):")
                     st.dataframe(df_gaps.head(20), use_container_width=True)
+                st.divider()
+                st.markdown("##### Output CSVs")
+                _show_csv(os.path.join(output_dir, "stocks_short_lived.csv"),
+                          "stocks_short_lived.csv")
+                _show_csv(os.path.join(output_dir, "stocks_with_trading_gaps.csv"),
+                          "stocks_with_trading_gaps.csv")
+                _show_csv(os.path.join(output_dir, "combined_data_verification.csv"),
+                          "combined_data_verification.csv")
 
         # ── Step 2: Compute Standard Momentum ────────────────────────
         _update("Computing standard momentum signal …", 17, "compute_momentum", "running")
@@ -212,6 +238,14 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
                             "Momentum Score Distribution")
                 _show_image(os.path.join(output_dir, "step2_factor_comparison.png"),
                             "Factor Time Series Comparison")
+                st.divider()
+                st.markdown("##### Output CSVs")
+                _show_csv(os.path.join(output_dir, "momentum_raw.csv"),
+                          "momentum_raw.csv")
+                _show_csv(os.path.join(output_dir, "momentum_standardised.csv"),
+                          "momentum_standardised.csv")
+                _show_csv(os.path.join(output_dir, "momentum_summary.csv"),
+                          "momentum_summary.csv")
 
         # ── Step 3: Fama-MacBeth ─────────────────────────────────────
         _update("Running Fama-MacBeth regressions …", 32, "fama_macbeth", "running")
