@@ -124,14 +124,25 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
         if os.path.isfile(path):
             st.image(path, caption=caption, use_container_width=True)
 
+    @st.cache_data(show_spinner=False)
+    def _read_file(path: str) -> pd.DataFrame:
+        """Read a CSV or Excel file, preferring CSV when both exist.
+        If only xlsx exists, create a CSV sibling for faster future reads."""
+        if path.endswith(".xlsx"):
+            csv_sibling = path.rsplit(".", 1)[0] + ".csv"
+            if os.path.isfile(csv_sibling):
+                return pd.read_csv(csv_sibling)
+            # Read xlsx once, save as CSV for next time
+            df = pd.read_excel(path)
+            df.to_csv(csv_sibling, index=False)
+            return df
+        return pd.read_csv(path)
+
     def _show_table(path: str, label: str = ""):
-        """Display a CSV or Excel file with up to 30 visible rows (scrollable)."""
+        """Display a CSV or Excel file with up to 20 visible rows (scrollable)."""
         if not os.path.isfile(path):
             return
-        if path.endswith(".xlsx"):
-            df = pd.read_excel(path)
-        else:
-            df = pd.read_csv(path)
+        df = _read_file(path)
         if label:
             st.markdown(f"**{label}**  ({len(df):,} rows)")
         row_height = 35
