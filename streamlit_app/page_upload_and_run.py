@@ -136,7 +136,7 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
             st.markdown(f"**{label}**  ({len(df):,} rows)")
         row_height = 35
         header_height = 38
-        max_visible = 30
+        max_visible = 20
         visible_rows = min(len(df), max_visible)
         height = header_height + row_height * visible_rows + 2
         st.dataframe(df, use_container_width=True, height=height)
