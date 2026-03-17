@@ -245,10 +245,6 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
                           f"stocks/week")
                 c3.metric("Momentum range",
                           f"{np.nanmin(momentum):.2f}  →  {np.nanmax(momentum):.2f}")
-                _show_image(os.path.join(output_dir, "step2_histogram_momentum.png"),
-                            "Momentum Score Distribution")
-                _show_image(os.path.join(output_dir, "step2_factor_comparison.png"),
-                            "Factor Time Series Comparison")
                 st.divider()
                 st.markdown("##### Output CSVs")
                 _show_table(os.path.join(output_dir, "momentum_raw.csv"),
