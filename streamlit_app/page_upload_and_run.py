@@ -201,7 +201,15 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
                     st.dataframe(df_short.head(20), use_container_width=True)
                 if len(df_gaps) > 0:
                     st.caption("Stocks with trading gaps (kept for per-window checks):")
-                    st.dataframe(df_gaps.head(20), use_container_width=True)
+                    df_gaps_display = df_gaps.copy()
+                    if 'Gap_Details' in df_gaps_display.columns:
+                        df_gaps_display['Gap_Details'] = df_gaps_display['Gap_Details'].apply(
+                            lambda glist: ' | '.join(
+                                f"{g['gap_start']} to {g['gap_end']} ({g['gap_weeks']}w)"
+                                for g in glist
+                            ) if isinstance(glist, list) else str(glist)
+                        )
+                    st.dataframe(df_gaps_display.head(20), use_container_width=True)
 
         # ── Step 2: Compute Standard Momentum ────────────────────────
         _update("Computing standard momentum signal …", 17, "compute_momentum", "running")
