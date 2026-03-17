@@ -284,9 +284,19 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
                 c3.metric("Mean weekly γ",
                           f"{np.nanmean(gamma_std)*100:.4f}%")
                 st.divider()
-                st.markdown("##### Output Files")
-                _show_table(os.path.join(output_dir, "fama_macbeth_standard_momentum.xlsx"),
-                            "fama_macbeth_standard_momentum.xlsx")
+                st.markdown("##### Summary Statistics")
+                _fm_path = os.path.join(output_dir, "fama_macbeth_standard_momentum.xlsx")
+                if os.path.isfile(_fm_path):
+                    _fm_raw = _read_file(_fm_path)
+                    # Extract only the Summary Statistics rows (after the header row)
+                    _ss_idx = _fm_raw.index[_fm_raw["Item"] == "SUMMARY STATISTICS"]
+                    if len(_ss_idx):
+                        _ss = _fm_raw.iloc[_ss_idx[0] + 1:].rename(
+                            columns={"Item": "Metric", "Details": "Value"}
+                        ).reset_index(drop=True)
+                        # Drop the sub-header row that repeats column names
+                        _ss = _ss[_ss["Metric"] != "Metric"].reset_index(drop=True)
+                        st.table(_ss)
 
         # ── Step 4: Compute Comomentum ───────────────────────────────
         _update("Computing comomentum (this may take a while) …", 47,
