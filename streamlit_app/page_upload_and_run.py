@@ -63,6 +63,7 @@ _PIPELINE_STEPS = [
     ("Step 3 — Fama-MacBeth Regressions",         "fama_macbeth"),
     ("Step 4 — Compute Comomentum",               "compute_comomentum"),
     ("Step 5 — Adjust Momentum (Inverse Comom.)", "adjust_momentum"),
+    ("Step 5b — Regime-Conditional Momentum",     "regime_momentum"),
     ("Step 6 — Performance Comparison",           "performance"),
 ]
 
@@ -494,14 +495,49 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
                     f"**{np.nanmean(gamma_adj)*100:.4f}%** (adjusted)"
                 )
 
+        # ── Step 5b: Regime-Conditional Momentum ─────────────────────
+        _update("Running regime-conditional momentum …", 82,
+                "regime_momentum", "running")
+
+        from regime_momentum.compute_regime_momentum import compute_regime_momentum
+        gamma_regime, tstat_regime, regime = compute_regime_momentum(
+            momentum_std, comomentum_arr,
+            data['returns_clean'], data['live'], data['dates'],
+            save_path=os.path.join(output_dir, 'fama_macbeth_regime_momentum.xlsx')
+        )
+
+        n_active = int(np.sum(regime == 1.0)) - 1
+        n_exit = int(np.sum(regime == 0.0))
+        n_valid_regime = int(np.sum(np.isfinite(gamma_regime)))
+        _update(f"✔ Regime momentum: t-stat = {tstat_regime:.4f}", 88,
+                "regime_momentum", "done")
+
+        with results_container:
+            with st.expander("Step 5b Results — Regime-Conditional Momentum",
+                             expanded=False):
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Active weeks (uncrowded)", f"{n_active:,}")
+                c2.metric("Exit weeks (crowded)", f"{n_exit:,}")
+                c3.metric("t-statistic", f"{tstat_regime:.4f}")
+                st.caption(
+                    f"When comomentum is in the top tercile (percentile rank > 0.67), "
+                    f"momentum exposures are set to zero (exit). "
+                    f"Fama-MacBeth regressions are re-run on the modified exposures."
+                )
+                st.caption(
+                    f"Mean weekly γ: **{np.nanmean(gamma_std)*100:.4f}%** (standard) → "
+                    f"**{np.nanmean(gamma_regime)*100:.4f}%** (regime)"
+                )
+
         # ── Step 6: Performance Comparison ───────────────────────────
-        _update("Computing performance statistics …", 82, "performance", "running")
+        _update("Computing performance statistics …", 90, "performance", "running")
 
         from performance import compute_stats, print_summary_table, plot_main_results
 
         stats_std = compute_stats(gamma_std, label='Standard Momentum')
-        stats_adj = compute_stats(gamma_adj, label='Adjusted Momentum')
-        print_summary_table(stats_std, stats_adj)
+        stats_adj = compute_stats(gamma_adj, label='Adjusted (Inv. Comom.)')
+        stats_regime = compute_stats(gamma_regime, label='Regime-Conditional')
+        print_summary_table(stats_std, stats_adj, stats_regime)
 
         plot_main_results(
             data['dates'], gamma_std, gamma_adj, comomentum_arr, scaling,
@@ -513,7 +549,7 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
 
         with results_container:
             with st.expander("Step 6 Results — Performance Comparison", expanded=True):
-                c1, c2 = st.columns(2)
+                c1, c2, c3 = st.columns(3)
                 with c1:
                     st.markdown("**Standard Momentum**")
                     st.metric("Ann. Mean Return",
@@ -522,12 +558,21 @@ def _run_pipeline(project_root: str, status_container, progress_bar,
                     st.metric("t-statistic", f"{stats_std['tstat']:.3f}")
                     st.metric("Max Drawdown", f"{stats_std['max_dd']*100:.2f}%")
                 with c2:
-                    st.markdown("**Adjusted Momentum**")
+                    st.markdown("**Adjusted (Inv. Comom.)**")
                     st.metric("Ann. Mean Return",
                               f"{stats_adj['mean_ann']*100:.2f}%")
                     st.metric("Ann. Sharpe Ratio", f"{stats_adj['sharpe']:.3f}")
                     st.metric("t-statistic", f"{stats_adj['tstat']:.3f}")
                     st.metric("Max Drawdown", f"{stats_adj['max_dd']*100:.2f}%")
+                with c3:
+                    st.markdown("**Regime-Conditional**")
+                    st.metric("Ann. Mean Return",
+                              f"{stats_regime['mean_ann']*100:.2f}%")
+                    st.metric("Ann. Sharpe Ratio",
+                              f"{stats_regime['sharpe']:.3f}")
+                    st.metric("t-statistic", f"{stats_regime['tstat']:.3f}")
+                    st.metric("Max Drawdown",
+                              f"{stats_regime['max_dd']*100:.2f}%")
                 _show_image(os.path.join(output_dir, "momentum_results.png"),
                             "Standard vs. Adjusted Momentum Factor Returns")
 

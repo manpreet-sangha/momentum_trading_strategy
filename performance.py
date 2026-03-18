@@ -102,28 +102,40 @@ def compute_stats(gamma_series, label, weeks_per_year=WEEKS_PER_YEAR):
     }
 
 
-def print_summary_table(stats_std, stats_adj):
+def print_summary_table(*stats_list):
     """
-    Prints a formatted side-by-side comparison table of the standard
-    and adjusted momentum strategies.
+    Prints a formatted side-by-side comparison table for one or more
+    momentum strategies.
 
     INPUTS:
-        stats_std : dict - statistics for the standard momentum factor
-        stats_adj : dict - statistics for the adjusted momentum factor
+        *stats_list : one or more dicts from compute_stats()
     """
-    print("\n" + "=" * 70)
+    if not stats_list:
+        return
+    col_w = 17
+    header = f"{'Metric':<35}"
+    for s in stats_list:
+        header += f" {s['label']:>{col_w}}"
+    print("\n" + "=" * (35 + (col_w + 1) * len(stats_list)))
     print("SUMMARY TABLE")
-    print("=" * 70)
-    print(f"{'Metric':<35} {'Standard Mom':>15} {'Adjusted Mom':>15}")
-    print("-" * 65)
-    print(f"{'Ann. Mean Return (%)':<35} {stats_std['mean_ann']*100:>15.2f} {stats_adj['mean_ann']*100:>15.2f}")
-    print(f"{'Ann. Std Dev (%)':<35} {stats_std['std_ann']*100:>15.2f} {stats_adj['std_ann']*100:>15.2f}")
-    print(f"{'Ann. Sharpe Ratio':<35} {stats_std['sharpe']:>15.3f} {stats_adj['sharpe']:>15.3f}")
-    print(f"{'T-Statistic':<35} {stats_std['tstat']:>15.3f} {stats_adj['tstat']:>15.3f}")
-    print(f"{'Skewness':<35} {stats_std['skew']:>15.3f} {stats_adj['skew']:>15.3f}")
-    print(f"{'Excess Kurtosis':<35} {stats_std['kurt']:>15.3f} {stats_adj['kurt']:>15.3f}")
-    print(f"{'Max Drawdown (%)':<35} {stats_std['max_dd']*100:>15.2f} {stats_adj['max_dd']*100:>15.2f}")
-    print("=" * 70)
+    print("=" * (35 + (col_w + 1) * len(stats_list)))
+    print(header)
+    print("-" * (35 + (col_w + 1) * len(stats_list)))
+    for metric, key, fmt, scale in [
+        ('Ann. Mean Return (%)', 'mean_ann', '.2f', 100),
+        ('Ann. Std Dev (%)',     'std_ann',  '.2f', 100),
+        ('Ann. Sharpe Ratio',    'sharpe',   '.3f', 1),
+        ('T-Statistic',          'tstat',    '.3f', 1),
+        ('Skewness',             'skew',     '.3f', 1),
+        ('Excess Kurtosis',      'kurt',     '.3f', 1),
+        ('Max Drawdown (%)',     'max_dd',   '.2f', 100),
+    ]:
+        row = f"{metric:<35}"
+        for s in stats_list:
+            val = s[key] * scale
+            row += f" {val:>{col_w}{fmt}}"
+        print(row)
+    print("=" * (35 + (col_w + 1) * len(stats_list)))
 
 
 # =====================================================================

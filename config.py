@@ -44,6 +44,12 @@ MIN_PAST_VALUES = 10   # minimum past comomentum values needed to
                         # compute a percentile rank (expanding window)
 
 # ─────────────────────────────────────────────────────────────────────
+# REGIME-CONDITIONAL MOMENTUM  (regime_momentum/compute_regime_momentum.py)
+# ─────────────────────────────────────────────────────────────────────
+REGIME_THRESHOLD = 0.67  # percentile rank above which comomentum is
+                          # considered "crowded" (top tercile → exit)
+
+# ─────────────────────────────────────────────────────────────────────
 # PERFORMANCE  (performance.py)
 # ─────────────────────────────────────────────────────────────────────
 WEEKS_PER_YEAR = 52    # used to annualise weekly statistics
