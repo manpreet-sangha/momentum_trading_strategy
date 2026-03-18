@@ -69,6 +69,7 @@ from comomentum.summary_statistics_table import generate_summary_table
 from comomentum.summary_statistics_latex import generate_summary_table_latex
 from comomentum.determinants_table import generate_determinants_table
 from comomentum.determinants_table_latex import generate_determinants_table_latex
+from regime_momentum.compute_regime_momentum import compute_regime_momentum
 from performance                import compute_stats, print_summary_table, plot_main_results
 from performance_table_latex    import generate_performance_table_latex
 
@@ -256,24 +257,43 @@ generate_adjusted_momentum_windows_latex(
 )
 
 # =====================================================================
+# (5b) REGIME-CONDITIONAL MOMENTUM
+#      Zero out exposures in crowded weeks and re-run Fama-MacBeth.
+# =====================================================================
+print("\n" + "=" * 70)
+print("  STEP 5b: Regime-Conditional Momentum")
+print("=" * 70)
+gamma_regime, tstat_regime, regime = compute_regime_momentum(
+    momentum_std, comomentum,
+    data['returns_clean'], data['live'], data['dates'],
+    save_path='output_data/fama_macbeth_regime_momentum.xlsx'
+)
+n_active = int(np.sum(regime == 1.0))
+n_exit   = int(np.sum(regime == 0.0))
+print(f"  Active weeks: {n_active}, Exit weeks: {n_exit}")
+print(f"  t-statistic = {tstat_regime:.4f}")
+
+# =====================================================================
 # (6) COMPARISON: Summary statistics & plots
 #     (Steps 5+6 combined: scaling already applied to gamma_std)
 # =====================================================================
 print("\n" + "=" * 70)
-print("  STEP 6: Comparing Standard vs. Adjusted Momentum")
+print("  STEP 6: Comparing Standard vs. Adjusted vs. Regime Momentum")
 print("=" * 70)
 
-stats_std = compute_stats(gamma_std, label='Standard Momentum')
-stats_adj = compute_stats(gamma_adj, label='Adjusted Momentum')
-print_summary_table(stats_std, stats_adj)
+stats_std    = compute_stats(gamma_std,    label='Standard Momentum')
+stats_adj    = compute_stats(gamma_adj,    label='Adjusted Momentum')
+stats_regime = compute_stats(gamma_regime, label='Regime Momentum')
+print_summary_table(stats_std, stats_adj, stats_regime)
 
 generate_performance_table_latex(
-    stats_std, stats_adj,
+    stats_std, stats_adj, stats_regime,
     save_path='latex_report/table_performance.tex'
 )
 
 plot_main_results(
     data['dates'], gamma_std, gamma_adj, comomentum, scaling,
+    gamma_regime=gamma_regime, regime=regime,
     save_path='output_data/momentum_results.png'
 )
 

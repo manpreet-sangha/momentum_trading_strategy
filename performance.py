@@ -143,20 +143,23 @@ def print_summary_table(*stats_list):
 # =====================================================================
 
 def plot_main_results(dates, gamma_std, gamma_adj, comomentum, scaling,
+                      gamma_regime=None, regime=None,
                       save_path='momentum_results.png'):
     """
-    Creates a 3-panel figure showing:
-        Panel 1: Cumulative factor returns - standard vs. adjusted momentum
+    Creates a multi-panel figure showing:
+        Panel 1: Cumulative factor returns - standard vs. adjusted (vs. regime)
         Panel 2: Comomentum time series
         Panel 3: Momentum scaling factor over time
 
     INPUTS:
-        dates      : pd.DatetimeIndex - weekly date vector
-        gamma_std  : T-length array - standard momentum factor returns
-        gamma_adj  : T-length array - adjusted momentum factor returns
-        comomentum : T-length array - comomentum measure
-        scaling    : T-length array - time-varying scaling factor
-        save_path  : str - file path to save the figure
+        dates        : pd.DatetimeIndex - weekly date vector
+        gamma_std    : T-length array - standard momentum factor returns
+        gamma_adj    : T-length array - adjusted momentum factor returns
+        comomentum   : T-length array - comomentum measure
+        scaling      : T-length array - time-varying scaling factor
+        gamma_regime : T-length array or None - regime momentum factor returns
+        regime       : T-length array or None - regime indicator (1=active, 0=exit)
+        save_path    : str - file path to save the figure
     """
 
     # Cumulative returns (sum of weekly log-like returns)
@@ -180,9 +183,13 @@ def plot_main_results(dates, gamma_std, gamma_adj, comomentum, scaling,
     # Plot adjusted FIRST (behind), then standard ON TOP so both visible
     ax1.plot(dates, cum_adj, label='Adjusted Momentum (Comomentum)',
              linewidth=1.2, color='darkorange', zorder=2)
+    if gamma_regime is not None:
+        cum_regime = np.nancumsum(gamma_regime)
+        ax1.plot(dates, cum_regime, label='Regime Momentum',
+                 linewidth=1.2, color='green', zorder=2)
     ax1.plot(dates, cum_std, label='Standard Momentum',
              linewidth=1.2, color='steelblue', zorder=3)
-    ax1.set_title('Cumulative Factor Returns: Standard vs. Adjusted Momentum',
+    ax1.set_title('Cumulative Factor Returns: Standard vs. Adjusted vs. Regime Momentum',
                   fontsize=14, fontweight='bold')
     ax1.set_xlabel('Date')
     ax1.set_ylabel('Cumulative Return')

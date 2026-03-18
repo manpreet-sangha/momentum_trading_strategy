@@ -1,0 +1,26 @@
+Item,Details
+FAMA-MACBETH CROSS-SECTIONAL REGRESSION OUTPUT,
+,
+Regression model (run cross-sectionally at each week t):,
+"    r_i,t  =  alpha_t  +  gamma_t * factor_i,t-1  +  epsilon_i,t",
+,
+COLUMN DEFINITIONS,
+Column,Description
+date,Week-ending date (YYYY-MM-DD) for this regression. Returns are measured at this date; factor exposure is lagged by one week (from date t-1).
+alpha,Intercept of the cross-sectional OLS regression. Represents the average return of a stock with zero factor exposure. Units: weekly return (decimal).
+gamma,Slope coefficient (= FACTOR RETURN for this week). Measures the return earned per unit of lagged factor exposure. A positive gamma means stocks with higher momentum last week earned higher returns this week. Units: weekly return (decimal).
+n_stocks,"Number of stocks that entered the regression for this week. A stock is included only if: (1) live == 1 (listed on the exchange), (2) return at time t is not NaN, (3) factor exposure at t-1 is not NaN."
+r_squared,R-squared of the cross-sectional regression. Fraction of cross-sectional return variance explained by the factor exposure. Typically very small (< 1%) because individual stock returns are noisy.
+mean_return,Mean of the dependent variable (stock returns) across the n_stocks that entered the regression. Units: weekly return (decimal).
+std_return,Standard deviation of stock returns across the n_stocks in the regression. Units: weekly return (decimal).
+mean_factor,Mean of the lagged factor exposures (x-variable) across n_stocks. After standardisation this should be approximately 0 each week.
+std_factor,Standard deviation of the lagged factor exposures across n_stocks. After standardisation this should be approximately 1 each week.
+,
+NOTE,"Rows where all values (except date) are blank correspond to weeks where the regression could not be run (e.g. the first 52 weeks, before any momentum score exists, or weeks with fewer than 3 valid stocks)."
+,
+SUMMARY STATISTICS,
+Metric,Value
+Mean gamma,0.00067393
+Std gamma,0.02780130
+T-statistic,0.9266
+Valid weeks,1461
